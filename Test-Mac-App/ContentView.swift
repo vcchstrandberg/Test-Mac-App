@@ -4,6 +4,7 @@ struct ContentView: View {
     @State private var password = ""
     @State private var wordCount = 4
     @State private var copied = false
+    @Environment(\.openWindow) private var openWindow
 
     var entropy: Int {
         Int(log2(Double(WordList.words.count)) * Double(wordCount) + log2(100))
@@ -20,12 +21,21 @@ struct ContentView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
-            VStack(alignment: .leading, spacing: 4) {
-                Text("Lösenordsgenerator")
-                    .font(.largeTitle.bold())
-                Text("Säkra lösenfraser byggda av svenska ord")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
+            HStack(alignment: .top) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Lösenordsgenerator")
+                        .font(.largeTitle.bold())
+                    Text("Säkra lösenfraser byggda av svenska ord")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                }
+                Spacer()
+                Button(action: { openWindow(id: "hjalp") }) {
+                    Image(systemName: "questionmark.circle")
+                        .font(.title2)
+                }
+                .buttonStyle(.plain)
+                .foregroundStyle(.secondary)
             }
 
             GroupBox {
@@ -115,6 +125,55 @@ struct ContentView: View {
     }
 }
 
+struct HelpView: View {
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            VStack(alignment: .leading, spacing: 12) {
+                helpSection(
+                    title: "Vad är en lösenfras?",
+                    text: "En lösenfras är ett lösenord som består av flera slumpmässigt valda ord. Det gör den både stark och lätt att komma ihåg, till exempel \"Berg-Skog-Vinter-42\"."
+                )
+
+                helpSection(
+                    title: "Hur fungerar det?",
+                    text: "Appen väljer slumpmässiga ord ur en lista med över 2\u{00A0}000 svenska ord och lägger till ett tvåsiffrigt tal. Ju fler ord du väljer, desto starkare blir lösensfrasen."
+                )
+
+                helpSection(
+                    title: "Vad betyder entropi?",
+                    text: "Entropi mäts i bitar och anger hur svår lösensfrasen är att gissa. Högre tal innebär bättre säkerhet. Under 40 bitar är svagt, över 50 bitar är starkt."
+                )
+
+                helpSection(
+                    title: "Styrkeindikatorn",
+                    text: "Den färgade pricken visar lösensfrasens styrka:\n• Orange — Acceptabel (~40 bitar)\n• Gul — Bra (~45 bitar)\n• Grön — Stark (~50 bitar)\n• Turkos — Mycket stark (~55+ bitar)"
+                )
+
+                helpSection(
+                    title: "Tips",
+                    text: "Använd minst 4 ord för viktiga konton. Undvik att återanvända lösenfraser — generera en ny för varje tjänst. Tryck ⏎ Retur för att snabbt generera en ny fras."
+                )
+            }
+        }
+        .padding(24)
+        .frame(width: 440)
+    }
+
+    private func helpSection(title: String, text: String) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(title)
+                .font(.headline)
+            Text(text)
+                .font(.callout)
+                .foregroundStyle(.secondary)
+        }
+    }
+}
+
 #Preview {
     ContentView()
+}
+
+#Preview("Hjälp") {
+    HelpView()
 }
