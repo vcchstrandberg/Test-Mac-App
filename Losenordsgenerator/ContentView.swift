@@ -5,9 +5,6 @@ struct ContentView: View {
     @State private var wordCount = 4
     @State private var copied = false
     @State private var showingHelp = false
-    #if os(macOS)
-    @Environment(\.openWindow) private var openWindow
-    #endif
 
     var entropy: Int {
         Int(log2(Double(WordList.words.count)) * Double(wordCount) + log2(100))
@@ -33,7 +30,7 @@ struct ContentView: View {
                         .foregroundStyle(.secondary)
                 }
                 Spacer()
-                Button(action: openHelp) {
+                Button(action: { showingHelp = true }) {
                     Image(systemName: "questionmark.circle")
                         .font(.title2)
                 }
@@ -80,9 +77,6 @@ struct ContentView: View {
                     }
                 }
                 .pickerStyle(.segmented)
-                #if os(macOS)
-                .frame(width: 160)
-                #endif
                 .onChange(of: wordCount) { _, _ in generate() }
             }
 
@@ -92,9 +86,6 @@ struct ContentView: View {
                         .frame(minWidth: 110)
                 }
                 .buttonStyle(.borderedProminent)
-                #if os(macOS)
-                .keyboardShortcut(.return)
-                #endif
 
                 Button(action: copyPassword) {
                     Label(
@@ -108,11 +99,7 @@ struct ContentView: View {
             }
         }
         .padding(28)
-        #if os(macOS)
-        .frame(width: 540)
-        #endif
         .onAppear(perform: generate)
-        #if os(iOS)
         .sheet(isPresented: $showingHelp) {
             NavigationStack {
                 HelpView()
@@ -123,15 +110,6 @@ struct ContentView: View {
                     }
             }
         }
-        #endif
-    }
-
-    func openHelp() {
-        #if os(macOS)
-        openWindow(id: "hjalp")
-        #else
-        showingHelp = true
-        #endif
     }
 
     func generate() {
@@ -144,12 +122,7 @@ struct ContentView: View {
     }
 
     func copyPassword() {
-        #if os(macOS)
-        NSPasteboard.general.clearContents()
-        NSPasteboard.general.setString(password, forType: .string)
-        #else
         UIPasteboard.general.string = password
-        #endif
         copied = true
         Task {
             try? await Task.sleep(for: .seconds(2))
@@ -189,9 +162,6 @@ struct HelpView: View {
             }
         }
         .padding(24)
-        #if os(macOS)
-        .frame(width: 440)
-        #endif
     }
 
     private func helpSection(title: String, text: String) -> some View {
@@ -207,8 +177,4 @@ struct HelpView: View {
 
 #Preview {
     ContentView()
-}
-
-#Preview("Hjälp") {
-    HelpView()
 }

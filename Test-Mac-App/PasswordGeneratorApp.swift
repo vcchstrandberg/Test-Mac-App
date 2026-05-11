@@ -2,12 +2,15 @@ import SwiftUI
 
 @main
 struct PasswordGeneratorApp: App {
+    #if os(macOS)
     @Environment(\.openWindow) private var openWindow
+    #endif
 
     var body: some Scene {
         WindowGroup("Lösenordsgenerator") {
             ContentView()
         }
+        #if os(macOS)
         .windowResizability(.contentSize)
         .commands {
             CommandGroup(replacing: .help) {
@@ -16,10 +19,13 @@ struct PasswordGeneratorApp: App {
                 }
             }
         }
+        #endif
 
+        #if os(macOS)
         Window("Hjälp", id: "hjalp") {
             HelpView()
         }
         .windowResizability(.contentSize)
+        #endif
     }
 }
